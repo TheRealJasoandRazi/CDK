@@ -21,4 +21,4 @@ const app = new cdk.App();
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 
 
-new lowlevelstack(app, 'low_level_stack', {});
+new lowlevelstack(app, 'lowlevelstack', {});
