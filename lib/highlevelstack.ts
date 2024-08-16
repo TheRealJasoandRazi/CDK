@@ -25,9 +25,29 @@ export class highlevelstack extends cdk.Stack {
         {
           cidrMask: 24,
           name: 'IsolatedSubnet',
-          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+          subnetType: ec2.SubnetType.PRIVATE_WITH_NAT,
         },
       ],
+    });
+
+    const nacl = new ec2.NetworkAcl(this, 'MyNACL', {
+        vpc,
+    });
+
+    nacl.addEntry('AllowInboundHTTPS', {
+        ruleNumber: 100,
+        cidr: ec2.AclCidr.anyIpv4(),
+        traffic: ec2.AclTraffic.tcpPort(443),
+        direction: ec2.TrafficDirection.INGRESS,
+        ruleAction: ec2.Action.ALLOW,
+    });
+
+    nacl.addEntry('AllowOutboundHTTPS', {
+        ruleNumber: 101,
+        cidr: ec2.AclCidr.anyIpv4(),
+        traffic: ec2.AclTraffic.tcpPort(443),
+        direction: ec2.TrafficDirection.EGRESS,
+        ruleAction: ec2.Action.ALLOW,
     });
 
     // Output the VPC ID
