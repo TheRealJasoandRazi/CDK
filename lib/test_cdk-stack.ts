@@ -79,7 +79,7 @@ export class TestCdkStack extends cdk.Stack {
       allocationId: new ec2.CfnEIP(this, 'EIP', {}).ref, // Create an Elastic IP for the NAT Gateway
     });
 
-    new ec2.CfnSubnetRouteTableAssociation(this, 'PrivateSubnetAssociation', {
+    new ec2.CfnSubnetRouteTableAssociation(this, 'PrivateSubnetAssociation_WithNATGateway', {
       subnetId: private_subnet_a_2.subnetId,
       routeTableId: privateRouteTable_WithNATGateway.ref,
     });
