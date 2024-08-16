@@ -11,35 +11,15 @@ export class TestCdkStack extends cdk.Stack {
     const vpc = new ec2.Vpc(this, 'MyVpc', {
       cidr: '10.0.0.0/16',
       maxAzs: 1,
-      //natGateways: 1,
-      /*subnetConfiguration: [//THIS IS FOR BOTH AVAILABILITY ZONES
-        {
-          //WILL HAVE NAT GATEWAY AND ALB HERE
-          subnetType: ec2.SubnetType.PUBLIC,
-          name: 'PublicSubnet',
-          cidrMask: 24,
-        },
-        {
-          //FARGATE TASKS IN THESE 2
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-          name: 'PrivateSubnetA',
-          cidrMask: 24,
-        },
-        {
-          //AURORA DB AND REPLICA IN THESE 2
-          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
-          name: 'PrivateSubnetC',
-          cidrMask: 24,
-        },
-      ]*/
     });
+
     const internetGateway = new ec2.CfnInternetGateway(this, 'MyInternetGateway', {});
+
     new ec2.CfnVPCGatewayAttachment(this, 'MyVpcGatewayAttachment', {
       vpcId: vpc.vpcId,
       internetGatewayId: internetGateway.ref
     });
-    //const az1 = 'ap-southeast-2a';
-    //const az2 = 'ap-southeast-2b';
+
     const az1 = vpc.availabilityZones[0];
     //const az2 = vpc.availabilityZones[1];
 
@@ -110,7 +90,7 @@ export class TestCdkStack extends cdk.Stack {
       gatewayId: internetGateway.ref,
     });
     
-    new cdk.CfnOutput(this, 'VpcId', { //LEVEL 1 CONSTRUCT
+    new cdk.CfnOutput(this, 'Seedragon_VPC', { //ID, makes it easier to read
       value: vpc.vpcId
     });
   }
