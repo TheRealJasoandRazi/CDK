@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { TestCdkStack } from '../lib/test_cdk-stack';
 import { lowlevelstack } from '../lib/lowlevelstack';
+import { highlevelstack } from '../lib/highlevelstack';
 
 const app = new cdk.App();
 //new TestCdkStack(app, 'TestCdkStack', {});
@@ -21,4 +22,5 @@ const app = new cdk.App();
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 
 
-new lowlevelstack(app, 'lowlevelstack', {});
+//new lowlevelstack(app, 'lowlevelstack', {});
+new highlevelstack(app, 'highlevelstack', {});

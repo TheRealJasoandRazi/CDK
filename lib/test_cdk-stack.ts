@@ -76,6 +76,7 @@ export class TestCdkStack extends cdk.Stack {
 
     const elasticIp = new ec2.CfnEIP(this, 'EIP', {});
 
+    //ELASTIC IP IS MALFORMED - ERROR
     const nat_gateway = new ec2.CfnNatGateway(this, "Nat_Gateway", {
       subnetId: public_subnet.subnetId,
       allocationId: elasticIp.allocationId,
@@ -100,6 +101,4 @@ export class TestCdkStack extends cdk.Stack {
     
     new cdk.CfnOutput(this, 'Seedragon_VPC', { //ID, makes it easier to read
       value: vpc.vpcId
-    });
-  }
-}
+   
