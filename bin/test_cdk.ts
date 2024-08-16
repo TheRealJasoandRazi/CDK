@@ -21,4 +21,5 @@ const app = new cdk.App();
 /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 
 //UNCOMMENT THE STACKS THAT YOU WANT TO RUN
-//new lo
+//new lowlevelstack(app, 'lowlevelstack', {});
+new highlevelstack(app, 'highlevelstack', {});
