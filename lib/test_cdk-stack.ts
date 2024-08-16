@@ -13,8 +13,10 @@ export class TestCdkStack extends cdk.Stack {
       maxAzs: 1, //Automatically creates subnets, 2 per AZ
     });*/
 
-    const vpc = new ec2.CfnVPC(this, 'myvpc', { //use level 1 constructs when working with other level 1 constructs
-      ipAddresses: IpAddresses.cidr('10.0.0.0/16'),
+    const vpc = new ec2.CfnVPC(this, 'MyVpc', {
+      cidrBlock: '10.0.0.0/16',
+      enableDnsSupport: true,
+      enableDnsHostnames: true,
     });
 
     const internetGateway = new ec2.CfnInternetGateway(this, 'MyInternetGateway', {});
