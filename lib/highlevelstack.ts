@@ -6,11 +6,14 @@ export class highlevelstack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create a high-level VPC
-    const vpc = new ec2.Vpc(this, 'MyVpc', {
-      ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'), // Specify the CIDR block
-      maxAzs: 2, // The number of availability zones to use
-      natGateways: 1, // The number of NAT gateways to create
+///////////////////////////////////////////////////////////////////////////
+/////////////////////////////// VPC ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    const vpc = new ec2.Vpc(this, 'Seedragon_VPC', {
+      ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'), 
+      maxAzs: 2, 
+      natGateways: 1, 
       subnetConfiguration: [
         {
           cidrMask: 24,
@@ -32,7 +35,7 @@ export class highlevelstack extends cdk.Stack {
 
     const nacl = new ec2.NetworkAcl(this, 'MyNACL', {
         vpc: vpc,
-        subnetSelection: {
+        subnetSelection: { //only private subnets are associated
             subnets: vpc.selectSubnets().subnets
         }
     });
@@ -53,7 +56,32 @@ export class highlevelstack extends cdk.Stack {
         ruleAction: ec2.Action.ALLOW,
     });
 
-    // Output the VPC ID
+    const ALB_SG = new ec2.SecurityGroup(this, 'ALB_SG', {
+        vpc: vpc,
+        description: 'Security group for ALB',
+      });
+     
+      const Fargate_Task_SG = new ec2.SecurityGroup(this, 'Fargate_Task_SG', {
+        vpc: vpc,
+        description: 'Security group for Fargate tasks',
+      });
+  
+      ALB_SG.addEgressRule(
+        ec2.Peer.securityGroupId(Fargate_Task_SG.securityGroupId),
+        ec2.Port.tcp(443), 
+        'Allow traffic to Fargate tasks'
+      );
+  
+      Fargate_Task_SG.addIngressRule(
+        ec2.Peer.securityGroupId(ALB_SG.securityGroupId),
+        ec2.Port.tcp(443),
+        'Allow traffic from ALB'
+      );
+
+///////////////////////////////////////////////////////////////////////////
+/////////////////////////////// ID's //////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
     new cdk.CfnOutput(this, 'VpcId', {
       value: vpc.vpcId,
     });
