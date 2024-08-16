@@ -31,10 +31,10 @@ export class highlevelstack extends cdk.Stack {
     });
 
     const nacl = new ec2.NetworkAcl(this, 'MyNACL', {
-        vpc,
-        /*subnetSelection: {
+        vpc: vpc,
+        subnetSelection: {
             subnets: vpc.selectSubnets().subnets
-        }*/
+        }
     });
 
     nacl.addEntry('AllowInboundHTTPS', {
@@ -52,13 +52,6 @@ export class highlevelstack extends cdk.Stack {
         direction: ec2.TrafficDirection.EGRESS,
         ruleAction: ec2.Action.ALLOW,
     });
-
-    const subnets = vpc.selectSubnets().subnets;
-
-    // Associate NACL with each subnet
-    for (const subnet of subnets) {
-        nacl.associateWithSubnet(subnet);
-    }
 
     // Output the VPC ID
     new cdk.CfnOutput(this, 'VpcId', {

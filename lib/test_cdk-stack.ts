@@ -101,6 +101,4 @@ export class TestCdkStack extends cdk.Stack {
     
     new cdk.CfnOutput(this, 'Seedragon_VPC', { //ID, makes it easier to read
       value: vpc.vpcId
-    });
-  }
-}
+   
