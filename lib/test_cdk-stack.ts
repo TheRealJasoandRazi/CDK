@@ -1,15 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { IpAddresses } from 'aws-cdk-lib/aws-ec2';
 
-export class testCdkStack extends cdk.Stack {
+export class TestCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // Create a VPC with a specific CIDR block
-    const vpc = new ec2.Vpc(this, 'MyVpc', {
-      cidr: '10.0.0.0/16',
-      maxAzs: 1,
+    /*const vpc = new ec2.Vpc(this, 'MyVpc', {
+      ipAddresses: IpAddresses.cidr('10.0.0.0/16'),
+      maxAzs: 1, //Automatically creates subnets, 2 per AZ
+    });*/
+
+    const vpc = new ec2.CfnVPC(this, 'myvpc', { //use level 1 constructs when working with other level 1 constructs
+      ipAddresses: IpAddresses.cidr('10.0.0.0/16'),
     });
 
     const internetGateway = new ec2.CfnInternetGateway(this, 'MyInternetGateway', {});
@@ -39,7 +44,7 @@ export class testCdkStack extends cdk.Stack {
     ///////////////////////////////////////////////////////////////////
     const public_subnet = new ec2.PublicSubnet(this, 'Public_Subnet', {
       vpcId: vpc.vpcId,
-      cidrBlock: '10.0.1.0/24', //this is depreciated, use IP address instead
+      cidrBlock: '10.0.1.0/24',
       availabilityZone: az1,
       mapPublicIpOnLaunch: true, //associates an ip to an instance at launch
     });
