@@ -7,7 +7,7 @@ export class TestCdkStack extends cdk.Stack {
     super(scope, id, props);
 
     const vpc = new ec2.Vpc(this, 'MyVpc', {
-      cidr: '10.0.0.0/16',
+      ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 1,
       subnetConfiguration: [
         {
@@ -28,16 +28,16 @@ export class TestCdkStack extends cdk.Stack {
       ],
     });
 
+    const publicSubnet = vpc.publicSubnets[0];
+    const privateSubnetA1 = vpc.privateSubnets[0];
+    const privateSubnetA2 = vpc.privateSubnets[1];
+
     const internetGateway = new ec2.CfnInternetGateway(this, 'MyInternetGateway', {});
 
     new ec2.CfnVPCGatewayAttachment(this, 'MyVpcGatewayAttachment', {
       vpcId: vpc.vpcId,
       internetGatewayId: internetGateway.ref,
     });
-
-    const publicSubnet = vpc.publicSubnets[0];
-    const privateSubnetA1 = vpc.privateSubnets[0];
-    const privateSubnetA2 = vpc.privateSubnets[1];
 
     const publicRouteTable = new ec2.CfnRouteTable(this, 'PublicRouteTable', {
       vpcId: vpc.vpcId,
