@@ -11,26 +11,26 @@ export class highlevelstack extends cdk.Stack {
 ///////////////////////////////////////////////////////////////////////////
 
     const vpc = new ec2.Vpc(this, 'Seedragon_VPC', {
-      ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'), 
-      maxAzs: 2, 
-      natGateways: 1, 
-      subnetConfiguration: [
-        {
-          cidrMask: 24,
-          name: 'PublicSubnet',
-          subnetType: ec2.SubnetType.PUBLIC,
-        },
-        {
-          cidrMask: 24,
-          name: 'PrivateSubnet',
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        },
-        {
-          cidrMask: 24,
-          name: 'IsolatedSubnet',
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        },
-      ],
+        ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'), 
+        maxAzs: 2, 
+        natGateways: 1, 
+        subnetConfiguration: [
+            {
+                cidrMask: 24,
+                name: 'PublicSubnet',
+                subnetType: ec2.SubnetType.PUBLIC,
+            },
+            {
+                cidrMask: 24,
+                name: 'PrivateSubnet',
+                subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+            },
+            {
+                cidrMask: 24,
+                name: 'IsolatedSubnet',
+                subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+            },
+        ],
     });
 
     const nacl = new ec2.NetworkAcl(this, 'MyNACL', {
@@ -59,24 +59,24 @@ export class highlevelstack extends cdk.Stack {
     const ALB_SG = new ec2.SecurityGroup(this, 'ALB_SG', {
         vpc: vpc,
         description: 'Security group for ALB',
-      });
+        allowAllOutbound: false,
+    });
      
-      const Fargate_Task_SG = new ec2.SecurityGroup(this, 'Fargate_Task_SG', {
+    const Fargate_Task_SG = new ec2.SecurityGroup(this, 'Fargate_Task_SG', {
         vpc: vpc,
         description: 'Security group for Fargate tasks',
-      });
+        allowAllOutbound: false,
+    });
   
-      ALB_SG.addEgressRule(
+    ALB_SG.addEgressRule(
         ec2.Peer.securityGroupId(Fargate_Task_SG.securityGroupId),
         ec2.Port.tcp(443), 
-        'Allow traffic to Fargate tasks'
-      );
-  
-      Fargate_Task_SG.addIngressRule(
+    );
+
+    Fargate_Task_SG.addIngressRule(
         ec2.Peer.securityGroupId(ALB_SG.securityGroupId),
         ec2.Port.tcp(443),
-        'Allow traffic from ALB'
-      );
+    );
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////// ID's //////////////////////////////////////

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { TestCdkStack } from '../lib/test_cdk-stack';
 import { lowlevelstack } from '../lib/lowlevelstack';
 import { highlevelstack } from '../lib/highlevelstack';
 
