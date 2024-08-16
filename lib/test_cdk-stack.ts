@@ -42,7 +42,7 @@ export class TestCdkStack extends cdk.Stack {
       vpcId: vpc.vpcId,
       cidrBlock: '10.0.1.0/24', //this is depreciated, use IP address instead
       availabilityZone: az1,
-      //mapPublicIpOnLaunch: true, //associates an ip to an instance at launch
+      mapPublicIpOnLaunch: true, //associates an ip to an instance at launch
     });
 
     const private_subnet_a_1 = new ec2.PrivateSubnet(this, "Private_Subnet_A_1", {
