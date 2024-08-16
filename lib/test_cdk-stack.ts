@@ -16,13 +16,13 @@ export class TestCdkStack extends cdk.Stack {
           cidrMask: 24,
         },
         {
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-          name: 'PrivateSubnetA',
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+          name: 'PrivateSubnetC',
           cidrMask: 24,
         },
         {
-          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
-          name: 'PrivateSubnetC',
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+          name: 'PrivateSubnetA',
           cidrMask: 24,
         },
       ],
