@@ -33,6 +33,11 @@ export class TestCdkStack extends cdk.Stack {
         },
       ]*/
     });
+    const internetGateway = new ec2.CfnInternetGateway(this, 'MyInternetGateway', {});
+    new ec2.CfnVPCGatewayAttachment(this, 'MyVpcGatewayAttachment', {
+      vpcId: vpc.vpcId,
+      internetGatewayId: internetGateway.ref
+    });
     //const az1 = 'ap-southeast-2a';
     //const az2 = 'ap-southeast-2b';
     const az1 = vpc.availabilityZones[0];
@@ -46,12 +51,16 @@ export class TestCdkStack extends cdk.Stack {
       vpcId: vpc.vpcId,
     });
 
+    const publicRouteTable = new ec2.CfnRouteTable(this, 'PublicRouteTable', {
+      vpcId: vpc.vpcId,
+    });
+
     ///////////////////////////////////////////////////////////////////
     /////////////////////  AVAILABILITY ZONE A  ///////////////////////
     ///////////////////////////////////////////////////////////////////
     const public_subnet = new ec2.PublicSubnet(this, 'Public_Subnet', {
       vpcId: vpc.vpcId,
-      cidrBlock: '10.0.1.0/24',
+      cidrBlock: '10.0.1.0/24', //this is depreciated, use IP address instead
       availabilityZone: az1,
       //mapPublicIpOnLaunch: true, //associates an ip to an instance at launch
     });
@@ -74,6 +83,11 @@ export class TestCdkStack extends cdk.Stack {
       routeTableId: privateRouteTable.ref,
     });
 
+    new ec2.CfnSubnetRouteTableAssociation(this, "PublicSubnetAssociation", {
+      subnetId: public_subnet.subnetId,
+      routeTableId: publicRouteTable.ref
+    })
+
     const nat_gateway = new ec2.CfnNatGateway(this, "Nat_Gateway", {
       subnetId: public_subnet.subnetId,
       allocationId: new ec2.CfnEIP(this, 'EIP', {}).ref, // Create an Elastic IP for the NAT Gateway
@@ -90,8 +104,12 @@ export class TestCdkStack extends cdk.Stack {
       natGatewayId: nat_gateway.ref
     });
 
+    new ec2.CfnRoute(this, 'RouteToInternetGateway', {
+      routeTableId: publicRouteTable.ref,
+      destinationCidrBlock: '0.0.0.0/0',
+      gatewayId: internetGateway.ref,
+    });
     
-
     new cdk.CfnOutput(this, 'VpcId', { //LEVEL 1 CONSTRUCT
       value: vpc.vpcId
     });
