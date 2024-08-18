@@ -69,12 +69,14 @@ export class highlevelstack extends cdk.Stack {
     });
   
     ALB_SG.addEgressRule(
-        ec2.Peer.securityGroupId(Fargate_Task_SG.securityGroupId),
+        Fargate_Task_SG,
+        //ec2.Peer.securityGroupId(Fargate_Task_SG.securityGroupId),
         ec2.Port.tcp(443), 
     );
 
     Fargate_Task_SG.addIngressRule(
-        ec2.Peer.securityGroupId(ALB_SG.securityGroupId),
+        //ec2.Peer.securityGroupId(ALB_SG.securityGroupId),
+        ALB_SG,
         ec2.Port.tcp(443),
     );
 
