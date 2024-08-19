@@ -144,4 +144,53 @@ export class highlevelstack extends cdk.Stack {
     //TO ADD
     // rules for traffic to/from nat gateway and lambda
 
-    const Application_Load_Balancer = new elb
+    const Application_Load_Balancer = new elbv2.ApplicationLoadBalancer(this, 'Application_Load_Balancer', {
+        vpc,
+        internetFacing: true,
+        loadBalancerName: "Seedragon-load-balancer",
+        securityGroup: ALB_SG,
+    });
+
+    //TO ADD
+    //Listeners and targets for fargate  
+    //route53 for the DNS "Seedragon.org"
+
+
+///////////////////////////////////////////////////////////////////////////
+//////////////////////// LAMBDA + EventBridge /////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    const lambdaFunction = new lambda.Function(this, 'lambda-function', {
+        runtime: lambda.Runtime.NODEJS_20_X,
+        memorySize: 1024,
+        timeout: cdk.Duration.seconds(5),
+        handler: 'index.main',
+        environment: {
+        REGION: 'ap-southeast-2',
+        AVAILABILITY_ZONES: JSON.stringify(
+                cdk.Stack.of(this).availabilityZones,
+            ),
+        },
+        //Placeholder code
+        code: lambda.Code.fromInline(` 
+            exports.main = async function(event, context) {
+            return "Hello, World!";
+            };
+        `),
+    });
+
+    const rule = new events.Rule(this, 'Rule', {
+        schedule: events.Schedule.rate(cdk.Duration.hours(1)),
+    });
+
+    rule.addTarget(new targets.LambdaFunction(lambdaFunction));
+
+///////////////////////////////////////////////////////////////////////////
+/////////////////////////////// ID's //////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    new cdk.CfnOutput(this, 'VpcId', { //Prints out values to when deployed
+      value: vpc.vpcId,
+    });
+  }
+}
