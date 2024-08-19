@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { Description } from '@mui/icons-material';
 
 export class highlevelstack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -67,18 +68,77 @@ export class highlevelstack extends cdk.Stack {
         description: 'Security group for Fargate tasks',
         allowAllOutbound: false,
     });
+
+    const EFS_Mount_SG = new ec2.SecurityGroup(this, 'EFS_Mount_SG', {
+        vpc: vpc,
+        description: 'Security group for EFS Mounts',
+        allowAllOutbound: false,
+    });
+
+    const Aurora_SG = new ec2.SecurityGroup(this, 'Aurora_SG', {
+        vpc: vpc,
+        description: 'Security group for Aurora DB',
+        allowAllOutbound: false,
+    });
   
-    ALB_SG.addEgressRule(
+    ALB_SG.addEgressRule( //Security group id is probably not initialised yet, so pass in const instead
         Fargate_Task_SG,
         //ec2.Peer.securityGroupId(Fargate_Task_SG.securityGroupId),
         ec2.Port.tcp(443), 
     );
 
+    ALB_SG.addEgressRule( 
+        ec2.Peer.anyIpv4(),
+        ec2.Port.tcp(443), 
+    );
+
     Fargate_Task_SG.addIngressRule(
-        //ec2.Peer.securityGroupId(ALB_SG.securityGroupId),
         ALB_SG,
         ec2.Port.tcp(443),
     );
+
+    Fargate_Task_SG.addIngressRule(
+        Aurora_SG,
+        ec2.Port.tcp(5432)
+    );
+
+    Fargate_Task_SG.addEgressRule(
+        Aurora_SG,
+        ec2.Port.tcp(5432)
+    );
+
+    Fargate_Task_SG.addEgressRule(
+        EFS_Mount_SG,
+        ec2.Port.tcp(2049)
+    );
+
+    Fargate_Task_SG.addIngressRule(
+        EFS_Mount_SG,
+        ec2.Port.tcp(2049)
+    );
+
+    EFS_Mount_SG.addEgressRule(
+        Fargate_Task_SG,
+        ec2.Port.tcp(2049)
+    );
+
+    EFS_Mount_SG.addIngressRule(
+        Fargate_Task_SG,
+        ec2.Port.tcp(2049)
+    );
+
+    Aurora_SG.addEgressRule(
+        Fargate_Task_SG,
+        ec2.port.tcp(5432)
+    );
+
+    Aurora_SG.addIngressRule(
+        Fargate_Task_SG,
+        ec2.port.tcp(5432)
+    );
+
+    //TO ADD
+    // rules for nat gateway and lambda
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////// ID's //////////////////////////////////////
