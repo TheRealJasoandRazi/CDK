@@ -159,16 +159,22 @@ export class highlevelstack extends cdk.Stack {
 ///////////////////////////////////////////////////////////////////////////
 
     const lambdaFunction = new lambda.Function(this, 'lambda-function', {
-      runtime: lambda.Runtime.NODEJS_20_X,
-      memorySize: 1024,
-      timeout: cdk.Duration.seconds(5),
-      handler: 'index.main',
-      environment: {
+        runtime: lambda.Runtime.NODEJS_20_X,
+        memorySize: 1024,
+        timeout: cdk.Duration.seconds(5),
+        handler: 'index.main',
+        environment: {
         REGION: 'ap-southeast-2',
         AVAILABILITY_ZONES: JSON.stringify(
-            cdk.Stack.of(this).availabilityZones,
-        ),
-      },
+                cdk.Stack.of(this).availabilityZones,
+            ),
+        },
+        //Placeholder code
+        code: lambda.Code.fromInline(` 
+            exports.main = async function(event, context) {
+            return "Hello, World!";
+            };
+        `),
     });
 
 ///////////////////////////////////////////////////////////////////////////
