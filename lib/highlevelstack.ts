@@ -34,18 +34,12 @@ export class highlevelstack extends cdk.Stack {
         ],
     });
 
-    const allSubnets = vpc.selectSubnets({
-        subnetTypes: [
-          ec2.SubnetType.PUBLIC,
-          ec2.SubnetType.PRIVATE_WITH_NAT,
-        ],
-    });
-
     const nacl = new ec2.NetworkAcl(this, 'MyNACL', {
         vpc: vpc,
+        networkAclName: "Seedragon NACL",
         subnetSelection: { //only private subnets are associated
             //subnets: vpc.selectSubnets().subnets
-            subnets: allSubnets
+            availabilityZones: vpc.availabilityZones
         }
     });
 
