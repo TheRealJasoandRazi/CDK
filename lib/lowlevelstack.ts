@@ -92,3 +92,4 @@ export class lowlevelstack extends cdk.Stack {
       value: vpc.ref,
     });
   }
+}
