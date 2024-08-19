@@ -34,10 +34,18 @@ export class highlevelstack extends cdk.Stack {
         ],
     });
 
+    const allSubnets = vpc.selectSubnets({
+        subnetTypes: [
+          ec2.SubnetType.PUBLIC,
+          ec2.SubnetType.PRIVATE_WITH_NAT,
+        ],
+    });
+
     const nacl = new ec2.NetworkAcl(this, 'MyNACL', {
         vpc: vpc,
         subnetSelection: { //only private subnets are associated
-            subnets: vpc.selectSubnets().subnets
+            //subnets: vpc.selectSubnets().subnets
+            subnets: allSubnets
         }
     });
 
@@ -143,18 +151,19 @@ export class highlevelstack extends cdk.Stack {
     const Application_Load_Balancer = new elbv2.ApplicationLoadBalancer(this, 'Application_Load_Balancer', {
         vpc,
         internetFacing: true,
-        loadBalancerName: "Seedragon_load_balancer",
+        loadBalancerName: "Seedragon-load-balancer",
         securityGroup: ALB_SG,
     });
 
     //TO ADD
     //Listeners and targets for fargate  
+    //route53 for the DNS "Seedragon.org"
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////// ID's //////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-    new cdk.CfnOutput(this, 'VpcId', {
+    new cdk.CfnOutput(this, 'VpcId', { //Prints out values to when deployed
       value: vpc.vpcId,
     });
   }
