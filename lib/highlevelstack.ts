@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 export class highlevelstack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -40,7 +41,7 @@ export class highlevelstack extends cdk.Stack {
         subnetSelection: { //only private subnets are associated
             availabilityZones: vpc.availabilityZones,
         }
-    });
+    }); //create a second NACL?
 
     nacl.addEntry('AllowInboundHTTPS', {
         ruleNumber: 100,
@@ -151,6 +152,22 @@ export class highlevelstack extends cdk.Stack {
     //TO ADD
     //Listeners and targets for fargate  
     //route53 for the DNS "Seedragon.org"
+
+
+///////////////////////////////////////////////////////////////////////////
+/////////////////////////////// LAMBDA ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    const lambdaFunction = new lambda.Function(this, 'lambda-function', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(5),
+      handler: 'index.main',
+      environment: {
+        REGION: 'ap-southeast-2',
+        AVAILABILITY_ZONES: vpc.availabilityZones
+      },
+    });
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////// ID's //////////////////////////////////////
