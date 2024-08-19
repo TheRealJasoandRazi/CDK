@@ -2,7 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { Public } from '@mui/icons-material';
 
 export class highlevelstack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -40,7 +39,6 @@ export class highlevelstack extends cdk.Stack {
         networkAclName: "Seedragon NACL",
         subnetSelection: { //only private subnets are associated
             availabilityZones: vpc.availabilityZones,
-            subnetType: Public
         }
     });
 
