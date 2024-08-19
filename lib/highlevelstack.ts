@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { Description } from '@mui/icons-material';
+import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 
 export class highlevelstack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -87,7 +87,7 @@ export class highlevelstack extends cdk.Stack {
         ec2.Port.tcp(443), 
     );
 
-    ALB_SG.addEgressRule( 
+    ALB_SG.addIngressRule( 
         ec2.Peer.anyIpv4(),
         ec2.Port.tcp(443), 
     );
@@ -129,16 +129,26 @@ export class highlevelstack extends cdk.Stack {
 
     Aurora_SG.addEgressRule(
         Fargate_Task_SG,
-        ec2.port.tcp(5432)
+        ec2.Port.tcp(5432)
     );
 
     Aurora_SG.addIngressRule(
         Fargate_Task_SG,
-        ec2.port.tcp(5432)
+        ec2.Port.tcp(5432)
     );
 
     //TO ADD
     // rules for nat gateway and lambda
+
+    const Application_Load_Balancer = new elbv2.ApplicationLoadBalancer(this, 'Application_Load_Balancer', {
+        vpc: vpc,
+        internetFacing: true,
+        loadBalancerName: "Seedragon_load_balancer",
+        securityGroup: ALB_SG,
+    });
+
+    //TO ADD
+    //Listeners and targets for fargate  
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////// ID's //////////////////////////////////////
