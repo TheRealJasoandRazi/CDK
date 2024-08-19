@@ -165,7 +165,9 @@ export class highlevelstack extends cdk.Stack {
       handler: 'index.main',
       environment: {
         REGION: 'ap-southeast-2',
-        AVAILABILITY_ZONES: vpc.availabilityZones
+        AVAILABILITY_ZONES: JSON.stringify(
+            cdk.Stack.of(this).availabilityZones,
+        ),
       },
     });
 
