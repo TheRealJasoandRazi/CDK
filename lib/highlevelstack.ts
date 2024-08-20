@@ -169,14 +169,18 @@ export class highlevelstack extends cdk.Stack {
             version: rds.AuroraPostgresEngineVersion.VER_13_4,
         }),
         vpc,
+        vpcSubnets: {
+            subnetGroupName: 'DatabaseSubnet',
+        },
         scaling: { //ACU = 2gb of memory
-            autoPause: cdk.Duration.minutes(10), // Automatically pause after 10 minutes of inactivity
+            //autoPause: cdk.Duration.minutes(10),
             minCapacity: rds.AuroraCapacityUnit.ACU_1,
             maxCapacity: rds.AuroraCapacityUnit.ACU_8,
         },
         credentials: credentials,
         defaultDatabaseName: 'Seedragon-Aurora-db', 
-        removalPolicy: cdk.RemovalPolicy.RETAIN, // When CDK destroy occurs, this stays
+        securityGroups: [Aurora_SG],
+        //removalPolicy: cdk.RemovalPolicy.RETAIN, // When CDK destroy occurs, this stays
     });
 
 ///////////////////////////////////////////////////////////////////////////
