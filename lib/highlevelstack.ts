@@ -5,6 +5,7 @@ import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
+import * as rds from 'aws-cdk-lib/aws-rds';
 
 export class highlevelstack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -155,6 +156,28 @@ export class highlevelstack extends cdk.Stack {
     //Listeners and targets for fargate  
     //route53 for the DNS "Seedragon.org"
 
+///////////////////////////////////////////////////////////////////////////
+/////////////////////////// Aurora DB /////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    // Chnage the credentials to whatever, should use AWS Secrets Manager though
+    const credentials = rds.Credentials.fromPassword('admin', new cdk.SecretValue('admin pass'));
+
+    // Aurora Serverless Postgre
+    const auroraCluster = new rds.ServerlessCluster(this, 'Seedragon-Aurora-db', {
+        engine: rds.DatabaseClusterEngine.auroraPostgres({
+            version: rds.AuroraPostgresEngineVersion.VER_13_4,
+        }),
+        vpc,
+        scaling: { //ACU = 2gb of memory
+            autoPause: cdk.Duration.minutes(10), // Automatically pause after 10 minutes of inactivity
+            minCapacity: rds.AuroraCapacityUnit.ACU_1,
+            maxCapacity: rds.AuroraCapacityUnit.ACU_8,
+        },
+        credentials: credentials,
+        defaultDatabaseName: 'Seedragon-Aurora-db', 
+        removalPolicy: cdk.RemovalPolicy.RETAIN, // When CDK destroy occurs, this stays
+    });
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////// LAMBDA + EventBridge /////////////////////////////
@@ -178,12 +201,17 @@ export class highlevelstack extends cdk.Stack {
             };
         `),
     });
+    //TO ADD
+    //Lambda needs a deploymnet package with script, libs and datasets.csv
+    //code: lambda.Code.fromAsset('path/to/your/deployment/package.zip'), // Specify the path to the ZIP file
 
     const rule = new events.Rule(this, 'Rule', {
         schedule: events.Schedule.rate(cdk.Duration.hours(1)),
     });
 
     rule.addTarget(new targets.LambdaFunction(lambdaFunction));
+    //TO ADD
+    //Rule to trigger lambda when AuroraDB is first initialised
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////// ID's //////////////////////////////////////
